@@ -1,0 +1,24 @@
+# --- UI & Data ---
+streamlit
+pandas
+
+# --- Utilitas Sistem ---
+python-dotenv       # Untuk load API KEY
+
+# --- Framework AI (LangChain) ---
+langchain
+langchain-community
+langchain-google-genai  # <--- INI PERUBAHAN UTAMANYA (Konektor Gemini)
+langchain-core          # Core components untuk chains
+
+# --- Vector Database ---
+chromadb            # Database vektor (untuk app1-3)
+tidb-vector         # TiDB Vector Store (untuk app4)
+pymysql             # MySQL driver untuk TiDB
+cryptography        # Untuk SSL connection ke TiDB
+
+# --- Embedding Models (Lokal) ---
+sentence-transformers  # Untuk HuggingFace embeddings lokal
+
+# --- Document Loaders ---
+pypdf               # Baca PDF
