@@ -56,20 +56,20 @@ if "embeddings" not in st.session_state:
 @st.cache_resource
 def init_tidb_connection():
     """
-    Inisialisasi koneksi ke TiDB Vector Store dari environment variables
+    Inisialisasi koneksi ke Database Vector Store dari environment variables
     """
     try:
         # Baca konfigurasi dari .env
-        tidb_host = os.getenv("TIDB_HOST")
-        tidb_port = os.getenv("TIDB_PORT", "4000")
-        tidb_user = os.getenv("TIDB_USER")
-        tidb_password = os.getenv("TIDB_PASSWORD")
-        tidb_database = os.getenv("TIDB_DATABASE", "test")
-        tidb_table = os.getenv("TIDB_TABLE", "rag_documents")
+        tidb_host = os.getenv("TIDB_HOST") or st.secrets["TIDB_HOST"]
+        tidb_port = os.getenv("TIDB_PORT", "4000") or st.secrets["TIDB_PORT"]
+        tidb_user = os.getenv("TIDB_USER") or st.secrets["TIDB_USER"]
+        tidb_password = os.getenv("TIDB_PASSWORD") or st.secrets["TIDB_PASSWORD"]
+        tidb_database = os.getenv("TIDB_DATABASE", "test") or st.secrets["TIDB_DATABASE"]
+        tidb_table = os.getenv("TIDB_TABLE", "rag_documents") or st.secrets["TIDB_TABLE"]
         
         # Validasi kredensial
         if not all([tidb_host, tidb_user, tidb_password]):
-            return None, None, "Kredensial TiDB tidak lengkap di file .env"
+            return None, None, "Database Kredensial tidak lengkap di file .env atau secrets"
         
         # Buat connection string
         connection_string = f"mysql+pymysql://{tidb_user}:{tidb_password}@{tidb_host}:{tidb_port}/{tidb_database}?ssl_ca=/etc/ssl/cert.pem&ssl_verify_cert=true&ssl_verify_identity=true"
@@ -92,7 +92,7 @@ def init_tidb_connection():
 
 # Auto-connect saat aplikasi dimulai
 if not st.session_state.tidb_connected and st.session_state.vector_store is None:
-    with st.spinner("🔄 Menghubungkan ke TiDB..."):
+    with st.spinner("🔄 Menghubungkan ke Database Vector Store..."):
         vector_store, embeddings, error = init_tidb_connection()
         
         if vector_store and embeddings:
@@ -155,22 +155,22 @@ with st.sidebar:
     
     # Tampilkan status koneksi
     if st.session_state.tidb_connected:
-        st.success("🟢 **Connected to TiDB**")
+        st.success("🟢 **Connected to Database Vector Store**")
         
         # Informasi koneksi
         with st.expander("ℹ️ Connection Info"):
-            st.write(f"**Host:** {os.getenv('TIDB_HOST', 'N/A')}")
-            st.write(f"**Port:** {os.getenv('TIDB_PORT', '4000')}")
-            st.write(f"**Database:** {os.getenv('TIDB_DATABASE', 'test')}")
-            st.write(f"**Table:** {os.getenv('TIDB_TABLE', 'rag_documents')}")
+            st.write(f"**Host:** {os.getenv('TIDB_HOST', 'N/A') or st.secrets['TIDB_HOST']}")
+            st.write(f"**Port:** {os.getenv('TIDB_PORT', '4000') or st.secrets['TIDB_PORT']}")
+            st.write(f"**Database:** {os.getenv('TIDB_DATABASE', 'test') or st.secrets['TIDB_DATABASE']}")
+            st.write(f"**Table:** {os.getenv('TIDB_TABLE', 'rag_documents') or st.secrets['TIDB_TABLE']}")
             # st.write(f"**User:** {os.getenv('TIDB_USER', 'N/A')}")
     else:
-        st.error("🔴 **Not Connected to TiDB**")
+        st.error("🔴 **Not Connected to Database Vector Store**")
         
         if st.session_state.connection_error:
             st.error(f"**Error:** {st.session_state.connection_error}")
         
-        st.info("💡 **Cara Mengatasi:**\n1. Pastikan file `.env` sudah dibuat\n2. Isi kredensial TiDB di `.env`\n3. Restart aplikasi")
+        st.info("💡 **Cara Mengatasi:**\n1. Pastikan file `.env` sudah dibuat\n2. Isi kredensial Database Vector Store di `.env`\n3. Restart aplikasi")
         
         # Tombol retry
         if st.button("🔄 Retry Connection"):
@@ -182,7 +182,7 @@ with st.sidebar:
     st.header("📂 Upload Dokumen")
     
     if not st.session_state.tidb_connected:
-        st.warning("Hubungkan ke TiDB terlebih dahulu!")
+        st.warning("Hubungkan ke Database Vector Store terlebih dahulu!")
     else:
         uploaded_file = st.file_uploader("Upload file PDF kamu", type="pdf")
         
