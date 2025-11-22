@@ -17,7 +17,12 @@ from langchain_classic.chains.combine_documents import create_stuff_documents_ch
 # 1. Load API Key & Database Config
 load_dotenv()
 if "GOOGLE_API_KEY" not in os.environ:
-    st.error("API Key tidak ditemukan. Pastikan file .env sudah dibuat!")
+    if "GOOGLE_API_KEY" in st.secrets:
+        # LangChain mencari key di os.environ
+        os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
+    else:
+        st.error("API Key tidak ditemukan. Pastikan file .env sudah dibuat!")
+        st.stop()
 
 # 2. Setup Halaman
 st.set_page_config(
